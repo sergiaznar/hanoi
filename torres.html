@@ -48,6 +48,7 @@
 
             function torres(axes) {
                 if (axes[0].length == 1) {
+                    //base case
                     if ($scope.show == true) {
                         $scope.movements.push('We move disc ' + axes[0][axes[0].length - 1] + ' from axe ' + axes[3][0] + ' to axe ' + axes[3][2]);
                     }
