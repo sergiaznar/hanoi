@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en" ng-app="angular1">
+
+<head>
+    <meta charset="utf-8">
+    <title>Torres de Hanoi</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+
+</head>
+
+<body ng-controller="MiControlador">
+    <h1>HANOI TOWERS</h1>
+
+
+    <p>Number of disks: <input type="text" ng-model="numdiscos"></p>
+    <button ng-click="inicio()">Start</button>
+    <button ng-click="borrar()">Erase</button>
+    <form>
+        Select option:<br>
+        <input type="radio" ng-model="show" ng-value="true" ng-checked="show==true">Show movements<br>
+        <input type="radio" ng-model="show" ng-value="false" ng-checked="show==false">Don't show movements
+
+    </form>
+
+    <h2>Time</h2>
+    <div>{{elapse}}</div>
+
+
+    <h2 ng-show="show">Movements</h2>
+    <ul ng-show="show">
+        <li ng-repeat="o in movements track by $index">
+            {{$index+1}} - {{o}}
+        </li>
+    </ul>
+
+    <script>
+        var miModulo = angular.module("angular1", []).controller('MiControlador', ['$scope', '$http', function ($scope, $http) {
+
+            $scope.show = true;
+            $scope.movements = [];
+            $scope.numdiscos = 4;
+            $scope.axes = [];
+            x = [];
+            $scope.elapse = 0;
+            var startTime, endTime;
+
+            function torres(axes) {
+                if (axes[0].length == 1) {
+                    if ($scope.show == true) {
+                        $scope.movements.push('We move disc ' + axes[0][axes[0].length - 1] + ' from axe ' + axes[3][0] + ' to axe ' + axes[3][2]);
+                    }
+                    axes[2].push(axes[0][0])
+                    return ([[], axes[1], axes[2], [axes[3][0], axes[3][1], axes[3][2]]])
+                }
+                else {
+                    x.push(axes[0].shift());
+                    acces = torres([axes[0], axes[2], axes[1], [axes[3][0], axes[3][2], axes[3][1]]]);
+
+                    axes[0] = acces[0];
+                    axes[0].push(x.pop());
+                    axes[1] = acces[2];
+                    axes[2] = acces[1];
+                    axes[3][0] = acces[3][0];
+                    axes[3][2] = acces[3][1];
+                    axes[3][1] = acces[3][2];
+
+                    axes[2].push(axes[0][0]);
+                    n = axes[0].shift();
+                    if ($scope.show == true) {
+                        $scope.movements.push('We move disc ' + axes[2][axes[2].length - 1] + ' from axe ' + axes[3][0] + ' to axe ' + axes[3][2]);
+                    }
+
+                    x.push(axes[2].shift());
+                    var acces = torres([axes[1], axes[0], axes[2], [axes[3][1], axes[3][0], axes[3][2]]]);
+                    axes[0] = acces[1];
+                    axes[1] = acces[0];
+                    axes[2] = acces[2];
+                    axes[2].unshift(x.pop());
+                    axes[3][0] = acces[3][1];
+                    axes[3][1] = acces[3][0];
+                    axes[3][2] = acces[3][2];
+                    return ([axes[0], axes[1], axes[2], [axes[3][0], axes[3][1], axes[3][2]]]);
+                }
+
+            }
+
+            $scope.borrar = function () {
+                $scope.movements = [];
+                $scope.axes = [];
+                x = [];
+                $scope.elapse = 0;
+                $scope.show = true;
+            }
+
+            $scope.inicio = function () {
+                $scope.movements = [];
+                $scope.axes = [];
+                x = [];
+                $scope.elapse = 0;
+                start();
+                $scope.elapse = "";
+                var a = [];
+                var b = [];
+                var c = [];
+                for (i = 0; i < $scope.numdiscos; i++) {
+                    a.push($scope.numdiscos - i);
+                }
+                var axes = [a, b, c, ["A", "B", "C"]];
+                torres(axes)
+                end();
+            }
+
+            function start() {
+                startTime = new Date();
+            };
+
+            function end() {
+                endTime = new Date();
+                var timeDiff = endTime - startTime;
+                timeDiff /= 1000;
+                $scope.elapse = (timeDiff + " seconds");
+            }
+
+        }])
+        
+    </script>
+
+</body>
+
+</html>
